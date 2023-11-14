@@ -3,52 +3,82 @@
 
 name: Audit
 
+
 on:
     push:
         branches: [main]
     pull_request:
         branches: [main]
+    schedule:
+        - cron: '0 10 * * 1' # run "At 10:00 on Monday"
 
 
 jobs:
-
     go-audit:
         name: Go Audit
         runs-on: ubuntu-22.04
+        timeout-minutes: 5 # just in case
+        strategy:
+            fail-fast: true
+            matrix:
+                go: ['stable', 'oldstable']
         
         steps:
-            - name: Checkout code
+            - name: Checkout Code
               uses: actions/checkout@v4
 
-            - name: Set up Go
+            - name: Setup Go
               uses: actions/setup-go@v4
               with:
-                go-version: '^1.21.4'
+                go-version: ${{ matrix.go }}
                 check-latest: true
 
             - name: Show Go Version
               run: go version
 
-            - name: Verify dependencies
+            # Check dependencies
+            - name: Go Tidy
+              run: go mod tidy && git diff --exit-code
+
+            - name: Go Mod
+              run: go mod download
+
+            - name: Go Mod Verify
               run: go mod verify
 
-            - name: Build
-              run: go build -v ./...
+            # Format and Vet
+            - name: Run Go Format
+              run: gofmt -s -w . && get diff --exit-code
                 
-            - name: Run go vet
+            - name: Run Go Vet
               run: go vet ./...
 
-            - name: Install staticcheck
+            - name: Install Staticcheck
               run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-            - name: Run staticcheck
+            - name: Run Staticcheck
               run: staticcheck ./...
 
-            - name: Install golint
+            - name: Install Golint
               run: go install golang.org/x/lint/golint@latest
 
-            - name: Run golint
+            - name: Run Golint
               run: golint ./...
 
-            - name: Run tests
-              run: go test -race -vet=off ./...
+            # Generate and Build Packages (ingnore executables)
+            - name: Go Generate
+              run: go generate ./... && git diff --exit-code
+
+            - name: Build
+              run: go build -v -o /dev/null ./...
+
+            # Test
+            - name: Run Tests
+              run: go test -v -count=1 -race -shuffle=on -coverprofile=coverage.txt -vet=off ./...
+
+            # Benchmark
+            - name: Go Benchmark
+              run: go test -v -shuffle=on -run=- -bench=. -benchtime=1x ./...
+
+            # Coverage
+            #- name: Upload Coverage
