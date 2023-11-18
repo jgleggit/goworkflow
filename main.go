@@ -4,7 +4,8 @@ import "fmt"
 
 // main function prints "Alice"
 // Note: main_test.go looks for "Bob"
-// so testing displays an error
+// So running main_test.go displays an error.
+//
 func main() {
 	msg := sayHello("Alice")
 	fmt.Println(msg)
