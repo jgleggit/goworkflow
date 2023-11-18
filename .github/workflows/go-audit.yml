@@ -98,5 +98,10 @@ jobs:
             - name: Go Benchmark
               run: go test -v -shuffle=on -run=- -bench=. -benchtime=1x ./...
 
-            # Coverage
+            # Code Coverage
             #- name: Upload Coverage
+            - name: Upload coverage reports to Codecov
+              uses: codecov/codecov-action@v3
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
