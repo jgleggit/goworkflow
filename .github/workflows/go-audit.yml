@@ -8,21 +8,21 @@ name: Golang Audit
 
 
 on:
-    push:
+    push: # Run job on push commit
         branches: [main]
-    pull_request:
+    pull_request: # Run job on pull request activity
         branches: [main]
-    schedule:
+    schedule: # Run job at the scheduled time (UTC).
         - cron: '0 10 * * 1' # run "At 10:00 on Monday every week."
 
 
 jobs:
-    go-audit:
-        name: Go Audit
-        runs-on: ubuntu-22.04
-        timeout-minutes: 5 # just in case
+    go-audit:   # job-id
+        name: Go Audit ${{ matrix.go }} # Name of job inc. Go versions matrix
+        runs-on: ubuntu-22.04 # OS Version
+        timeout-minutes: 5 # Just in case.
         strategy:
-            fail-fast: true
+            fail-fast: true # Cancel any job in progress if any matrix job fails
             matrix:
                 go: ['stable', 'oldstable']
         
@@ -33,8 +33,8 @@ jobs:
             - name: Setup Go
               uses: actions/setup-go@v4
               with:
+                token: ${{ secrets.GH_DOTCOM_TOKEN}}
                 go-version: ${{ matrix.go }}
-                check-latest: true
 
             - name: Show Go Version
               run: go version
