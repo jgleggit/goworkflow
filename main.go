@@ -7,7 +7,7 @@ import "fmt"
 // So running main_test.go displays an error.
 //
 func main() {
-	msg := sayHello("Alice")
+	msg := sayHello("Bob")
 	fmt.Println(msg)
 }
 
