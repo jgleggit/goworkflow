@@ -1,7 +1,10 @@
-# Golang workflow
+# Golang github workflow action.
+#
+# Thanks to - 
 # Ref: alexedwards.net/blog/ci-with-go-and-github-actions
+#
 
-name: Audit
+name: Golang Audit
 
 
 on:
@@ -10,7 +13,7 @@ on:
     pull_request:
         branches: [main]
     schedule:
-        - cron: '0 10 * * 1' # run "At 10:00 on Monday"
+        - cron: '0 10 * * 1' # run "At 10:00 on Monday every week."
 
 
 jobs:
@@ -65,14 +68,14 @@ jobs:
             - name: Run Golint
               run: golint ./...
 
-            # Generate and Build Packages (ingnore executables)
+            # Generate and Build Packages (ignore producing executables)
             - name: Go Generate
               run: go generate ./... && git diff --exit-code
 
             - name: Build
               run: go build -v -o /dev/null ./...
 
-            # Test
+            # Test - runs "*_test.go"
             - name: Run Tests
               run: go test -v -count=1 -race -shuffle=on -coverprofile=coverage.txt -vet=off ./...
 
