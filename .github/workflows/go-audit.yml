@@ -2,9 +2,12 @@
 #
 # Thanks to - 
 # Ref: alexedwards.net/blog/ci-with-go-and-github-actions
+# Ref:
 #
 
-name: Golang Audit
+name: Golang Audit # Name of workflow as it appears on repo 'Actions' tab
+
+permissions: {} # No permissions required to run this job
 
 
 on:
@@ -13,7 +16,7 @@ on:
     pull_request: # Run job on pull request activity
         branches: [main]
     schedule: # Run job at the scheduled time (UTC).
-        - cron: '0 10 * * 1' # run "At 10:00 on Monday every week."
+        - cron: '0 10 * * 1' # Run job at "10@00 on Monday every week."
 
 
 jobs:
@@ -27,17 +30,22 @@ jobs:
                 go: ['stable', 'oldstable']
         
         steps:
-            - name: Checkout Code
+            - name: Checkout Code # Checkout repo code.
               uses: actions/checkout@v4
 
-            - name: Setup Go
+            - name: Install Go # Then setup Go.
               uses: actions/setup-go@v4
               with:
                 token: ${{ secrets.GH_DOTCOM_TOKEN}}
-                go-version: ${{ matrix.go }}
+                
+                go-version: ${{ matrix.go }} # Use both 'stable' and 'oldstable'
+                # go-version-file: go.mod # go-version overrides go.mod version 
+                
+                check-latest: true # Check for latest semver of stable oldstable
 
-            - name: Show Go Version
+            - name: Show Go Version # The version of Go the code will run on.
               run: go version
+
 
             # Check dependencies
             - name: Go Tidy
@@ -49,10 +57,20 @@ jobs:
             - name: Go Mod Verify
               run: go mod verify
 
-            # Format and Vet
+              
+              
+            # Format and Lint
             - name: Run Go Format
               run: gofmt -s -w . && get diff --exit-code
-                
+
+            - name: Install Golint
+              run: go install golang.org/x/lint/golint@latest
+
+            - name: Run Golint
+              run: golint ./...
+
+
+            # Vet
             - name: Run Go Vet
               run: go vet ./...
 
@@ -62,13 +80,8 @@ jobs:
             - name: Run Staticcheck
               run: staticcheck ./...
 
-            - name: Install Golint
-              run: go install golang.org/x/lint/golint@latest
 
-            - name: Run Golint
-              run: golint ./...
-
-            # Generate and Build Packages (ignore producing executables)
+              # Generate and Build Packages (ignore producing executables)
             - name: Go Generate
               run: go generate ./... && git diff --exit-code
 
