@@ -2,7 +2,7 @@
 #
 # Thanks to - 
 # Ref: alexedwards.net/blog/ci-with-go-and-github-actions
-# Ref:
+# Ref: github.com/cristalhq/.github
 #
 
 name: Golang Audit # Name of workflow as it appears on repo 'Actions' tab
@@ -19,6 +19,7 @@ on:
         - cron: '0 10 * * 1' # Run job at "10@00 on Monday every week."
 
 
+
 jobs:
     go-audit:   # job-id
         name: Go Audit ${{ matrix.go }} # Name of job inc. Go versions matrix
@@ -33,7 +34,7 @@ jobs:
             - name: Checkout Code # Checkout repo code.
               uses: actions/checkout@v4
 
-            - name: Install Go # Then setup Go.
+            - name: Install Go # Install and setup Go.
               uses: actions/setup-go@v4
               with:
                 token: ${{ secrets.GH_DOTCOM_TOKEN}}
