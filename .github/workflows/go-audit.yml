@@ -17,6 +17,7 @@ on:
         branches: [main]
     schedule: # Run job at the scheduled time (UTC).
         - cron: '0 10 * * 1' # Run job at "10@00 on Monday every week."
+    fork:
 
 
 
