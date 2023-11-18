@@ -43,7 +43,7 @@ jobs:
                 go-version: ${{ matrix.go }} # Use both 'stable' and 'oldstable'
                 # go-version-file: go.mod # go-version overrides go.mod version 
                 
-                check-latest: true # Check for latest semver of stable oldstable
+                check-latest: false # Check for latest semver of stable oldstable
 
             - name: Show Go Version # The version of Go the code will run on.
               run: go version
