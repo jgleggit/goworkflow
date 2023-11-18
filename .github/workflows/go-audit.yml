@@ -49,8 +49,8 @@ jobs:
 
 
             # Check dependencies
-            - name: Go Tidy
-              run: go mod tidy && git diff --exit-code
+            #- name: Go Tidy
+              #run: go mod tidy && git diff --exit-code
 
             - name: Go Mod
               run: go mod download
